@@ -54,6 +54,11 @@ class ServicesHunter(HunterModule):
 
                         exe = utils.extract_executable(t) or ""
 
+                        # ServiceDll context is semantically distinct from the
+                        # generic "path under AppData" signal scoring adds, so we
+                        # keep the explicit ServiceDll reason. The generic exe
+                        # path / LOLBin reasons are added by scoring.py and are
+                        # not duplicated here.
                         if service_dll:
                             sd = str(service_dll)
                             if utils.is_strongly_suspicious_path(sd) or \
@@ -61,19 +66,14 @@ class ServicesHunter(HunterModule):
                                 reasons.append(
                                     f"ServiceDll in user-writable location: {sd}")
 
-                        if utils.is_strongly_suspicious_path(exe):
-                            reasons.append(f"Service binary in malware-typical path: {exe}")
-                        elif utils.is_mildly_suspicious_path(exe) and not utils.in_trusted_root(exe):
-                            reasons.append(f"Service binary under AppData/ProgramData: {exe}")
+                        # We still need to TRIGGER scoring on the exe path / LOLBin
+                        # signals — emit a detection if any of the gating checks fire.
+                        triggered = bool(reasons) \
+                            or utils.is_strongly_suspicious_path(exe) \
+                            or (utils.is_mildly_suspicious_path(exe) and not utils.in_trusted_root(exe)) \
+                            or (utils.is_lolbin(t) and not utils.in_trusted_root(exe))
 
-                        # Only flag LOLBin when the binary lives outside trusted
-                        # roots — msiserver / WinHttpAutoProxySvc etc. legitimately
-                        # carry msiexec / svchost as their ImagePath.
-                        lol = utils.is_lolbin(t)
-                        if lol and not utils.in_trusted_root(exe):
-                            reasons.append(f"Service ImagePath uses LOLBin: {lol}")
-
-                        if not reasons:
+                        if not triggered:
                             continue
 
                         recency = utils.recency_label(utils.reg_key_mtime(sk))

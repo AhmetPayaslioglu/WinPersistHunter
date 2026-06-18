@@ -38,8 +38,7 @@ class ScreensaverHunter(HunterModule):
                 reasons = []
                 if not utils.in_trusted_root(scr):
                     reasons.append(f"Screensaver path outside Windows/Program Files: {scr}")
-                if utils.is_strongly_suspicious_path(scr):
-                    reasons.append("Screensaver in malware-typical location")
+                # malware-typical path reason added by scoring.py
                 if not reasons:
                     return out
                 out.append(self.make_detection(

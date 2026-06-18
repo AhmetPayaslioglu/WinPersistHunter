@@ -119,7 +119,7 @@ class OfficePersistenceHunter(HunterModule):
                             continue
                         out.append(self.make_detection(
                             location=p, name=entry, value=full,
-                            reasons=[f"Recently added file in {label}"],
+                            reasons=[f"Affected artifact: {label}"],
                             metadata={"recency": mtime},
                         ))
             else:
@@ -128,7 +128,7 @@ class OfficePersistenceHunter(HunterModule):
                     continue
                 out.append(self.make_detection(
                     location=os.path.dirname(p), name=os.path.basename(p), value=p,
-                    reasons=[f"{label} modified in the last 7 days"],
+                    reasons=[f"Affected artifact: {label}"],
                     metadata={"recency": rec, "rare_technique": True},
                 ))
         return out

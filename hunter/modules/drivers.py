@@ -127,21 +127,24 @@ class DriversHunter(HunterModule):
 
                         # Hash if we have a BYOVD list, or hash_all requested.
                         h = None
+                        byovd = False
                         if bad or self.hash_all:
                             h = _hash_file(resolved)
                             if h:
                                 meta["sha256"] = h
                                 if h in bad:
+                                    # scoring.py emits the BYOVD reason from this flag.
                                     meta["byovd"] = True
-                                    reasons.append("Hash matches loldrivers.io BYOVD list")
+                                    byovd = True
 
                         if not is_trusted:
                             reasons.append(f"Driver ImagePath outside Windows/Program Files: {resolved}")
 
-                        if recency == "very_recent" and not is_trusted:
-                            reasons.append("Driver registered in the last 7 days")
+                        # recency / BYOVD reasons added by scoring.py via the
+                        # metadata flags. We still gate emission on them here.
+                        trigger_recent = recency == "very_recent" and not is_trusted
 
-                        if not reasons:
+                        if not reasons and not trigger_recent and not byovd:
                             continue  # Routine signed Microsoft driver — skip.
 
                         out.append(self.make_detection(

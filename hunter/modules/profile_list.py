@@ -41,9 +41,8 @@ class ProfileListHunter(HunterModule):
                             if low.startswith("c:\\users\\") or \
                                low.startswith("%systemdrive%\\users\\"):
                                 continue
+                            # malware-typical path reason is added by scoring.py
                             reasons = [f"Profile path outside C:\\Users: {pth}"]
-                            if utils.is_strongly_suspicious_path(pth):
-                                reasons.append("Profile path in malware-typical location")
                             out.append(self.make_detection(
                                 location=f"HKLM\\{KEY}\\{sub}",
                                 name=sub, value=str(pth),

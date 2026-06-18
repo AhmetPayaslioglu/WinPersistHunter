@@ -67,9 +67,9 @@ class ScheduledTasksHunter(HunterModule):
                     rare = True
                 if signals:
                     reasons.append("Action exhibits: " + ", ".join(signals))
-                if recency == "very_recent":
-                    reasons.append("Task file modified in the last 7 days")
-                if not reasons:
+                # recency reason added by scoring.py from metadata flag.
+                trigger_recent = recency == "very_recent"
+                if not reasons and not trigger_recent:
                     continue
                 out.append(self.make_detection(
                     location=path,
