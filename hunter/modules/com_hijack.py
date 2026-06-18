@@ -57,7 +57,9 @@ class COMHijackHunter(HunterModule):
                 v, mtime = _read_default(winreg.HKEY_CURRENT_USER, path)
                 if not v:
                     continue
-                reasons = ["HKCU CLSID entry shadows HKLM (COM hijack pattern)"]
+                # Note: the "HKCU shadows HKLM" reason is added by scoring.py
+                # via the hkcu_overrides_hklm metadata flag — do not duplicate it here.
+                reasons = []
                 if server == "TreatAs":
                     reasons.append("TreatAs redirect — CLSID identity remap")
                 out.append(self.make_detection(
