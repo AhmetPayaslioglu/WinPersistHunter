@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.pyo
+output/
+.venv/
+venv/
+.vscode/
+.idea/
+canary/_setup_log.txt
+*.log

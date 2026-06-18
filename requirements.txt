@@ -1,0 +1,2 @@
+# WinPersist Hunter has no third-party dependencies.
+# All functionality uses the Python 3.8+ standard library and PowerShell calls.
